@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: gnm-lead-management-backend
+    env: node
+    plan: free
+    buildCommand: cd backend && npm install
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        fromDatabase:
+          name: gnm-mongo
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_NAME
+        value: GHAR N MAKAAN
+      - key: ADMIN_EMAIL
+        value: gnmgroup47@gmail.com
+      - key: ADMIN_MOBILE
+        value: 8860069778
+      - key: ADMIN_PASSWORD
+        value: gnm2026
+      - key: JWT_EXPIRE
+        value: 30d
+
+staticSites:
+  - name: gnm-lead-management-frontend
+    env: static
+    buildCommand: cd frontend && npm install && npm run build
+    publishDir: frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
