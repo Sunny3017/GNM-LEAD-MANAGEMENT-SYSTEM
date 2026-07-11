@@ -6,10 +6,43 @@ const connectDB = require('./config/db');
 const rateLimit = require('express-rate-limit');
 const http = require('http');
 const socketIo = require('socket.io');
+const mongoose = require('mongoose');
+const Admin = require('./models/Admin');
 
 dotenv.config();
 
 connectDB();
+
+// Auto-seed admin on server start
+const seedAdminOnStart = async () => {
+  try {
+    const existingAdmin = await Admin.findOne({ 
+      $or: [
+        { email: process.env.ADMIN_EMAIL || 'admin@gnm.com' },
+        { mobile: process.env.ADMIN_MOBILE || '9876543210' }
+      ]
+    });
+    
+    if (!existingAdmin) {
+      const admin = await Admin.create({
+        name: process.env.ADMIN_NAME || 'Admin',
+        email: process.env.ADMIN_EMAIL || 'admin@gnm.com',
+        mobile: process.env.ADMIN_MOBILE || '9876543210',
+        password: process.env.ADMIN_PASSWORD || 'admin123'
+      });
+      console.log('✅ Admin created automatically!');
+    } else {
+      console.log('✅ Admin already exists!');
+    }
+  } catch (error) {
+    console.error('❌ Error seeding admin:', error);
+  }
+};
+
+// Run seed after DB connection is established
+mongoose.connection.once('open', () => {
+  seedAdminOnStart();
+});
 
 const app = express();
 
