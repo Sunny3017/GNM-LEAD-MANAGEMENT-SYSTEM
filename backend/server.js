@@ -16,7 +16,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:5173", 
+      "https://gnm-lead-management-system-1.onrender.com"
+    ],
     methods: ["GET", "POST"]
   }
 });
